@@ -649,3 +649,96 @@
       showMsg("Deposit confirmed.", false);
       loadGlobalStats();
       loadDashboard();
+    } catch (e) {
+      showMsg(e.message || "Deposit failed", true);
+    }
+  }
+
+  async function doWithdraw() {
+    const token = ($("withdrawToken").value || "").trim();
+    const amountStr = ($("withdrawAmount").value || "0").trim();
+    const amountWei = humanToWei(amountStr);
+    if (!token || amountWei === 0n) { showMsg("Token and amount required.", true); return; }
+    const c = getContractWithSigner();
+    if (!c) { showMsg("Connect wallet and set contract.", true); return; }
+    try {
+      const tx = await c.withdraw(token, amountWei);
+      showMsg("Tx sent: " + tx.hash, false);
+      await tx.wait();
+      showMsg("Withdraw confirmed.", false);
+      loadGlobalStats();
+      loadDashboard();
+    } catch (e) {
+      showMsg(e.message || "Withdraw failed", true);
+    }
+  }
+
+  async function doClaim() {
+    const token = ($("claimToken").value || "").trim();
+    if (!token) { showMsg("Token address required.", true); return; }
+    const c = getContractWithSigner();
+    if (!c) { showMsg("Connect wallet and set contract.", true); return; }
+    try {
+      const tx = await c.claimYield(token);
+      showMsg("Tx sent: " + tx.hash, false);
+      await tx.wait();
+      showMsg("Claim confirmed.", false);
+      loadGlobalStats();
+      loadDashboard();
+    } catch (e) {
+      showMsg(e.message || "Claim failed", true);
+    }
+  }
+
+  function saveConfig() {
+    const addr = ($("configContract").value || "").trim();
+    if (!addr) { showMsg("Enter contract address.", true); return; }
+    localStorage.setItem(CONFIG_KEY, addr);
+    contractAddress = addr;
+    contract = initContract();
+    showMsg("Contract address saved. Reload data.", false);
+    loadGlobalStats();
+    loadStrategies();
+    loadTokens();
+    loadDashboard();
+  }
+
+  $("btnConnect").onclick = connect;
+  $("btnDeposit").onclick = doDeposit;
+  $("btnWithdraw").onclick = doWithdraw;
+  $("btnClaim").onclick = doClaim;
+  $("btnSaveConfig").onclick = saveConfig;
+  $("btnRefreshDashboard").onclick = function () { loadDashboard(); loadGlobalStats(); loadFeeConfig(); };
+  $("btnCopyContract").onclick = copyContractAddress;
+
+  $("configContract").value = contractAddress;
+
+  function twzFormatBps(bps) { return bps + " bps (" + (Number(bps) / 100).toFixed(2) + "%)"; }
+  function twzFormatWei(w) { return weiToHuman(w); }
+  function twzParseWei(s) { return humanToWei(s); }
+  function twzValidateAddress(a) { return a && a.trim().length >= 40 && a.trim().startsWith("0x"); }
+  function twzGetContractAddr() { return contractAddress; }
+  function twzSetContractAddr(addr) { contractAddress = addr; localStorage.setItem(CONFIG_KEY, addr); contract = initContract(); }
+  function twzReloadAll() { loadGlobalStats(); loadFeeConfig(); loadNetworkInfo(); loadDashboard(); loadStrategies(); loadTokens(); }
+  function twzIsConnected() { return !!userAddress; }
+  function twzUserAddr() { return userAddress || ""; }
+  function twzShort(a) { return shortAddr(a); }
+  function twzShowError(msg) { showMsg(msg, true); }
+  function twzShowOk(msg) { showMsg(msg, false); }
+  function twzDecimals() { return 18; }
+  function twzBpsDenom() { return 10000; }
+  function twzFeeFromBps(amountWei, bps) { return (Number(amountWei) * bps) / twzBpsDenom(); }
+  function twzNetAfterFee(amountWei, bps) { return Number(amountWei) - twzFeeFromBps(amountWei, bps); }
+  function twzContractAbi() { return ABI; }
+  function twzConfigKey() { return CONFIG_KEY; }
+  function twzVersion() { return "1.0"; }
+  function twzAppName() { return "Twizzler"; }
+  function twzPanelShow(id) {
+    document.querySelectorAll(".twz-tab").forEach(function (t) { t.classList.remove("active"); });
+    document.querySelectorAll(".twz-panel").forEach(function (p) { p.classList.remove("visible"); });
+    var tab = document.querySelector(".twz-tab[data-panel=\"" + id + "\"]");
+    if (tab) tab.classList.add("active");
+    var panel = document.getElementById("panel-" + id);
+    if (panel) panel.classList.add("visible");
+  }
+  function twzGetStatDeposited() { return $("statDeposited").textContent; }
