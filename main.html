@@ -277,3 +277,96 @@
 
     <section class="twz-panel" id="panel-help">
       <div class="twz-card">
+        <h3>Help</h3>
+        <div class="twz-section-title">Dashboard</div>
+        <p class="twz-hint">Shows your deposit balance and claimable yield per token. Refresh to update.</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Deposit</div>
+        <p class="twz-hint">Enter an allowed token address and amount (in human units, e.g. 100 for 100 tokens). You must approve the FundManagerAI contract to spend your tokens first (ERC20 approve).</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Withdraw</div>
+        <p class="twz-hint">Enter token address and amount to withdraw. Amount cannot exceed your net deposit balance for that token.</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Claim yield</div>
+        <p class="twz-hint">Claim your vested yield for a token. Only claimable (vested) amount is sent; the rest vests over time.</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Strategies</div>
+        <p class="twz-hint">Lists all strategies: target contract, token, allocated amount, harvested amount, and active status.</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Tokens</div>
+        <p class="twz-hint">Lists token addresses that are allowed for deposit on the contract.</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Config</div>
+        <p class="twz-hint">Set the deployed FundManagerAI contract address. Stored in localStorage. Reload the page or click Refresh after changing.</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Fees</div>
+        <p class="twz-hint">Deposit fee is deducted from your deposit before crediting your balance. Performance fee is deducted from harvested yield before it is credited to the reward pool or users. Both are expressed in basis points (bps); 100 bps = 1%.</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Vesting</div>
+        <p class="twz-hint">Yield credited to you vests linearly over a block range. Use Claim yield to withdraw the portion that has already vested. Unvested yield cannot be claimed until the vesting period completes.</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Strategies</div>
+        <p class="twz-hint">Each strategy has a target contract and a token. The manager allocates deposits to strategies up to a cap (percentage of total deposits for that token). Harvested yield is distributed according to contract logic (e.g. performance fee to treasury, rest to users).</p>
+        <div class="twz-divider"></div>
+        <div class="twz-section-title">Console API</div>
+        <p class="twz-hint">In the browser console you can use: twizzler.connect(), twizzler.loadStats(), twizzler.loadDashboard(), twizzler.reloadAll(), twz.shortAddr(addr), twz.weiToHuman(wei), twz.humanToWei("100"), twz.getContractAddr(), twz.setContractAddr("0x..."), twz.panelShow("dashboard"), twz.validateDepositForm(), twz.doDepositWithValidation().</p>
+      </div>
+    </section>
+
+    <div class="twz-card" style="margin-top:1rem;">
+      <h3>About Twizzler</h3>
+      <p class="twz-hint">Twizzler is the web interface for FundManagerAI — a DeFi yield allocator that routes customer deposits across strategies for optimal yield. Use the AvaAI Python app for CLI access. Contract: FundManagerAI.sol. All values are read from or sent to the connected contract; ensure you are on the correct network and that the contract address is set.</p>
+      <div class="twz-divider"></div>
+      <p class="twz-hint">FundManagerAI supports multiple tokens and strategies. Deposits are subject to a configurable deposit fee; harvested yield is subject to a performance fee. Yield is vested over blocks; use Claim yield to withdraw your vested portion. Only the contract owner can add strategies, allocate funds, and harvest from strategies.</p>
+      <div class="twz-divider"></div>
+      <p class="twz-hint">Before depositing, approve the FundManagerAI contract to spend your ERC20 tokens (token.approve(contractAddress, amount)). You can set the contract address in the Config tab; it is stored in your browser (localStorage) and persists across reloads.</p>
+      <div class="twz-divider"></div>
+      <p class="twz-hint">Twizzler exposes a small API on window.twizzler and window.twz for programmatic use (e.g. twizzler.connect(), twizzler.loadStats(), twz.shortAddr(addr), twz.weiToHuman(wei)). Open the browser console to inspect.</p>
+    </div>
+
+    <footer class="twz-footer">
+      Twizzler — FundManagerAI web interface. Connect wallet and use at your own risk.
+      No financial advice. Ensure you are on the correct network before transacting.
+    </footer>
+  </div>
+
+  <script>
+(function () {
+  const CONFIG_KEY = "twizzler_contract_address";
+  const ABI = [
+    "function getGlobalStats() view returns (uint256 totalDeposited, uint256 totalWithdrawn, uint256 totalYieldHarvested, uint256 strategyCount, bool paused)",
+    "function getDepositBalance(address user, address token) view returns (uint256)",
+    "function getClaimableYield(address user, address token) view returns (uint256)",
+    "function deposit(address token, uint256 amount)",
+    "function withdraw(address token, uint256 amount)",
+    "function claimYield(address token)",
+    "function getTokenList() view returns (address[])",
+    "function getStrategy(uint256 strategyId) view returns (address target, address token, uint256 allocated, uint256 harvested, uint256 capBps, bool active, uint256 addedAtBlock)",
+    "function strategyCount() view returns (uint256)",
+    "function getFeeConfig() view returns (uint256 perfBps, uint256 depBps)"
+  ];
+
+  let provider, signer, contract, userAddress;
+  let contractAddress = localStorage.getItem(CONFIG_KEY) || "";
+
+  const $ = (id) => document.getElementById(id);
+  const msgBox = $("msgBox");
+  const walletAddr = $("walletAddr");
+
+  function shortAddr(a) {
+    if (!a) return "";
+    return a.slice(0, 6) + "…" + a.slice(-4);
+  }
+
+  function showMsg(text, isErr) {
+    msgBox.innerHTML = "<div class=\"twz-msg " + (isErr ? "err" : "ok") + "\">" + text + "</div>";
+    setTimeout(function () { msgBox.innerHTML = ""; }, 6000);
+  }
+
+  function weiToHuman(wei) {
+    if (typeof wei !== "bigint" && typeof wei !== "number") wei = BigInt(wei);
+    const d = Number(wei) / 1e18;
+    return d.toFixed(6);
+  }
+
+  function weiToHumanLong(wei, decimals) {
