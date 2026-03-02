@@ -91,3 +91,96 @@
     .twz-stat .lbl { font-size: 0.75rem; color: var(--twz-muted); margin-top: 0.2rem; }
     .twz-form-group { margin-bottom: 1rem; }
     .twz-form-group label { display: block; font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--twz-muted); }
+    .twz-form-group input {
+      width: 100%;
+      font-family: var(--twz-mono);
+      font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--twz-border);
+      border-radius: 8px;
+      background: var(--twz-bg);
+      color: var(--twz-text);
+    }
+    .twz-form-group input:focus { outline: none; border-color: var(--twz-green); }
+    .twz-msg { padding: 0.6rem 0.9rem; border-radius: 8px; margin-bottom: 0.75rem; font-size: 0.85rem; }
+    .twz-msg.err { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
+    .twz-msg.ok { background: rgba(34, 197, 94, 0.12); border: 1px solid var(--twz-green); color: var(--twz-green); }
+    .twz-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .twz-table th, .twz-table td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--twz-border); }
+    .twz-table th { color: var(--twz-muted); font-weight: 500; }
+    .twz-table .mono { font-family: var(--twz-mono); }
+    .twz-loading { text-align: center; padding: 1.5rem; color: var(--twz-muted); }
+    footer.twz-footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--twz-border); font-size: 0.75rem; color: var(--twz-muted); text-align: center; }
+    .twz-badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 500; }
+    .twz-badge.green { background: rgba(34, 197, 94, 0.2); color: var(--twz-green); }
+    .twz-badge.amber { background: rgba(245, 158, 11, 0.2); color: var(--twz-amber); }
+    .twz-badge.muted { background: rgba(100, 116, 139, 0.2); color: var(--twz-muted); }
+    .twz-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 640px) { .twz-grid-2 { grid-template-columns: 1fr; } }
+    .twz-info-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px solid var(--twz-border); font-size: 0.85rem; }
+    .twz-info-row .key { color: var(--twz-muted); }
+    .twz-info-row .val { font-family: var(--twz-mono); color: var(--twz-text); }
+    .twz-section-title { font-size: 0.9rem; font-weight: 600; color: var(--twz-amber); margin-bottom: 0.5rem; }
+    .twz-copy-btn { font-size: 0.75rem; padding: 0.25rem 0.5rem; margin-left: 0.5rem; cursor: pointer; border-radius: 4px; border: 1px solid var(--twz-border); background: var(--twz-surface); color: var(--twz-text); }
+    .twz-copy-btn:hover { border-color: var(--twz-green); }
+    .twz-network { font-size: 0.8rem; color: var(--twz-muted); margin-top: 0.25rem; }
+    .twz-card + .twz-card { margin-top: 1rem; }
+    .twz-hint { font-size: 0.8rem; color: var(--twz-muted); margin-top: 0.5rem; }
+    .twz-divider { height: 1px; background: var(--twz-border); margin: 1rem 0; }
+    .twz-flex { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+    .twz-input-group { display: flex; gap: 0.5rem; align-items: center; }
+    .twz-input-group input { flex: 1; min-width: 0; }
+    .twz-empty { padding: 1.5rem; text-align: center; color: var(--twz-muted); font-size: 0.9rem; }
+    .twz-table-wrap { overflow-x: auto; }
+    .twz-table .num { text-align: right; }
+    .twz-panel.visible { animation: twzFade 0.2s ease; }
+    @keyframes twzFade { from { opacity: 0; } to { opacity: 1; } }
+    .twz-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .twz-btn.small { font-size: 0.8rem; padding: 0.35rem 0.7rem; }
+    .twz-link { color: var(--twz-blue); text-decoration: none; }
+    .twz-link:hover { text-decoration: underline; }
+    .twz-alert { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem; }
+    .twz-alert.warn { background: rgba(245, 158, 11, 0.15); border: 1px solid var(--twz-amber); color: var(--twz-amber); }
+    .twz-alert.info { background: rgba(59, 130, 246, 0.15); border: 1px solid var(--twz-blue); color: var(--twz-blue); }
+    .twz-tooltip { position: relative; }
+    .twz-tooltip:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 0; padding: 0.25rem 0.5rem; background: var(--twz-card); border: 1px solid var(--twz-border); border-radius: 4px; font-size: 0.75rem; white-space: nowrap; z-index: 1; }
+    .twz-stats-lg .twz-stat .val { font-size: 1.35rem; }
+    .twz-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+    .twz-card-header h3 { margin-bottom: 0; }
+    .twz-refresh { font-size: 0.8rem; padding: 0.25rem 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="twz-wrap">
+    <header class="twz-header">
+      <div>
+        <div class="twz-logo">Twizzler</div>
+        <div class="twz-tagline">FundManagerAI — DeFi yield dashboard</div>
+      </div>
+      <div class="twz-connect">
+        <span class="twz-addr" id="walletAddr"></span>
+        <button type="button" class="twz-btn primary" id="btnConnect">Connect wallet</button>
+      </div>
+    </header>
+
+    <div class="twz-stats" id="globalStats">
+      <div class="twz-stat"><span class="val" id="statDeposited">0</span><span class="lbl">Total deposited</span></div>
+      <div class="twz-stat"><span class="val" id="statWithdrawn">0</span><span class="lbl">Total withdrawn</span></div>
+      <div class="twz-stat"><span class="val" id="statYield">0</span><span class="lbl">Total yield</span></div>
+      <div class="twz-stat"><span class="val" id="statStrategies">0</span><span class="lbl">Strategies</span></div>
+      <div class="twz-stat"><span class="val" id="statPaused">—</span><span class="lbl">Paused</span></div>
+    </div>
+
+    <div class="twz-tabs">
+      <button type="button" class="twz-tab active" data-panel="dashboard">Dashboard</button>
+      <button type="button" class="twz-tab" data-panel="deposit">Deposit</button>
+      <button type="button" class="twz-tab" data-panel="withdraw">Withdraw</button>
+      <button type="button" class="twz-tab" data-panel="claim">Claim yield</button>
+      <button type="button" class="twz-tab" data-panel="strategies">Strategies</button>
+      <button type="button" class="twz-tab" data-panel="tokens">Tokens</button>
+      <button type="button" class="twz-tab" data-panel="config">Config</button>
+      <button type="button" class="twz-tab" data-panel="help">Help</button>
+    </div>
+
+    <div id="msgBox"></div>
+
