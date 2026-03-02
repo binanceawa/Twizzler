@@ -463,3 +463,96 @@
       if (!w) { showMsg("No wallet found. Install MetaMask or similar.", true); return; }
       const accounts = await w.request({ method: "eth_requestAccounts" });
       if (!accounts.length) { showMsg("No account selected.", true); return; }
+      provider = new ethers.BrowserProvider(w);
+      signer = await provider.getSigner();
+      userAddress = await signer.getAddress();
+      walletAddr.textContent = shortAddr(userAddress);
+      contract = initContract();
+      loadGlobalStats();
+      loadFeeConfig();
+      loadNetworkInfo();
+      loadDashboard();
+      loadStrategies();
+      loadTokens();
+    } catch (e) {
+      showMsg(e.message || "Connection failed", true);
+    }
+  }
+
+  async function loadGlobalStats() {
+    if (!contractAddress) {
+      $("statDeposited").textContent = "—";
+      $("statWithdrawn").textContent = "—";
+      $("statYield").textContent = "—";
+      $("statStrategies").textContent = "—";
+      $("statPaused").textContent = "—";
+      return;
+    }
+    const c = initContract();
+    if (!c) return;
+    try {
+      const r = await c.getGlobalStats();
+      $("statDeposited").textContent = weiToHuman(r[0]);
+      $("statWithdrawn").textContent = weiToHuman(r[1]);
+      $("statYield").textContent = weiToHuman(r[2]);
+      $("statStrategies").textContent = String(r[3]);
+      $("statPaused").textContent = r[4] ? "Yes" : "No";
+    } catch (e) {
+      $("statDeposited").textContent = "?";
+      $("statWithdrawn").textContent = "?";
+      $("statYield").textContent = "?";
+      $("statStrategies").textContent = "?";
+      $("statPaused").textContent = "?";
+    }
+  }
+
+  async function loadFeeConfig() {
+    if (!contractAddress) return;
+    const c = initContract();
+    if (!c) return;
+    try {
+      const r = await c.getFeeConfig();
+      $("feePerfBps").textContent = String(r[0]);
+      $("feeDepBps").textContent = String(r[1]);
+    } catch (e) {
+      $("feePerfBps").textContent = "?";
+      $("feeDepBps").textContent = "?";
+    }
+  }
+
+  async function loadNetworkInfo() {
+    $("networkChainId").textContent = "—";
+    $("networkContract").textContent = "—";
+    if (!contractAddress) return;
+    $("networkContract").textContent = contractAddress;
+    if (!window.ethereum) return;
+    try {
+      const p = new ethers.BrowserProvider(window.ethereum);
+      const n = await p.getNetwork();
+      $("networkChainId").textContent = String(n.chainId);
+    } catch (e) {
+      $("networkChainId").textContent = "?";
+    }
+  }
+
+  function copyContractAddress() {
+    if (!contractAddress) return;
+    navigator.clipboard.writeText(contractAddress).then(function () { showMsg("Address copied.", false); }).catch(function () { showMsg("Copy failed.", true); });
+  }
+
+  async function loadDashboard() {
+    const el = $("dashboardPosition");
+    const loading = $("dashboardLoading");
+    el.innerHTML = "";
+    if (!userAddress || !contractAddress) {
+      el.innerHTML = "<p style=\"color:var(--twz-muted);\">Connect wallet and set contract address to see your position.</p>";
+      return;
+    }
+    loading.style.display = "block";
+    const c = initContract();
+    if (!c) { loading.style.display = "none"; return; }
+    try {
+      const tokens = await c.getTokenList();
+      if (!tokens || tokens.length === 0) {
+        el.innerHTML = "<p style=\"color:var(--twz-muted);\">No tokens in list.</p>";
+        loading.style.display = "none";
