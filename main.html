@@ -556,3 +556,96 @@
       if (!tokens || tokens.length === 0) {
         el.innerHTML = "<p style=\"color:var(--twz-muted);\">No tokens in list.</p>";
         loading.style.display = "none";
+        return;
+      }
+      let html = "<table class=\"twz-table\"><thead><tr><th>Token</th><th>Balance</th><th>Claimable yield</th></tr></thead><tbody>";
+      for (let i = 0; i < tokens.length; i++) {
+        const t = tokens[i];
+        const bal = await c.getDepositBalance(userAddress, t);
+        const claim = await c.getClaimableYield(userAddress, t);
+        if (bal === 0n && claim === 0n) continue;
+        html += "<tr><td class=\"mono\">" + shortAddr(t) + "</td><td class=\"mono\">" + weiToHuman(bal) + "</td><td class=\"mono\">" + weiToHuman(claim) + "</td></tr>";
+      }
+      html += "</tbody></table>";
+      el.innerHTML = html || "<p style=\"color:var(--twz-muted);\">No positions.</p>";
+    } catch (e) {
+      el.innerHTML = "<p class=\"twz-msg err\">" + (e.message || "Load failed") + "</p>";
+    }
+    loading.style.display = "none";
+  }
+
+  async function loadStrategies() {
+    const el = $("strategiesList");
+    const loading = $("strategiesLoading");
+    el.innerHTML = "";
+    if (!contractAddress) {
+      el.innerHTML = "<p style=\"color:var(--twz-muted);\">Set contract address in Config.</p>";
+      return;
+    }
+    loading.style.display = "block";
+    const c = initContract();
+    if (!c) { loading.style.display = "none"; return; }
+    try {
+      const n = await c.strategyCount();
+      if (n === 0n) {
+        el.innerHTML = "<p style=\"color:var(--twz-muted);\">No strategies.</p>";
+        loading.style.display = "none";
+        return;
+      }
+      let html = "<table class=\"twz-table\"><thead><tr><th>Id</th><th>Target</th><th>Token</th><th>Allocated</th><th>Harvested</th><th>Active</th></tr></thead><tbody>";
+      for (let i = 1; i <= Number(n); i++) {
+        const r = await c.getStrategy(i);
+        html += "<tr><td>" + i + "</td><td class=\"mono\">" + shortAddr(r[0]) + "</td><td class=\"mono\">" + shortAddr(r[1]) + "</td><td class=\"mono\">" + weiToHuman(r[2]) + "</td><td class=\"mono\">" + weiToHuman(r[3]) + "</td><td>" + (r[5] ? "Yes" : "No") + "</td></tr>";
+      }
+      html += "</tbody></table>";
+      el.innerHTML = html;
+    } catch (e) {
+      el.innerHTML = "<p class=\"twz-msg err\">" + (e.message || "Load failed") + "</p>";
+    }
+    loading.style.display = "none";
+  }
+
+  async function loadTokens() {
+    const el = $("tokensList");
+    const loading = $("tokensLoading");
+    el.innerHTML = "";
+    if (!contractAddress) {
+      el.innerHTML = "<p style=\"color:var(--twz-muted);\">Set contract address in Config.</p>";
+      return;
+    }
+    loading.style.display = "block";
+    const c = initContract();
+    if (!c) { loading.style.display = "none"; return; }
+    try {
+      const tokens = await c.getTokenList();
+      if (!tokens || tokens.length === 0) {
+        el.innerHTML = "<p style=\"color:var(--twz-muted);\">No tokens.</p>";
+        loading.style.display = "none";
+        return;
+      }
+      let html = "<table class=\"twz-table\"><thead><tr><th>#</th><th>Address</th></tr></thead><tbody>";
+      tokens.forEach(function (t, i) {
+        html += "<tr><td>" + (i + 1) + "</td><td class=\"mono\">" + t + "</td></tr>";
+      });
+      html += "</tbody></table>";
+      el.innerHTML = html;
+    } catch (e) {
+      el.innerHTML = "<p class=\"twz-msg err\">" + (e.message || "Load failed") + "</p>";
+    }
+    loading.style.display = "none";
+  }
+
+  async function doDeposit() {
+    const token = ($("depositToken").value || "").trim();
+    const amountStr = ($("depositAmount").value || "0").trim();
+    const amountWei = humanToWei(amountStr);
+    if (!token || amountWei === 0n) { showMsg("Token and amount required.", true); return; }
+    const c = getContractWithSigner();
+    if (!c) { showMsg("Connect wallet and set contract.", true); return; }
+    try {
+      const tx = await c.deposit(token, amountWei);
+      showMsg("Tx sent: " + tx.hash, false);
+      await tx.wait();
+      showMsg("Deposit confirmed.", false);
+      loadGlobalStats();
+      loadDashboard();
