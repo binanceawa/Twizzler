@@ -184,3 +184,96 @@
 
     <div id="msgBox"></div>
 
+    <section class="twz-panel visible" id="panel-dashboard">
+      <div class="twz-card">
+        <div class="twz-card-header">
+          <h3>Your position</h3>
+          <button type="button" class="twz-btn twz-refresh" id="btnRefreshDashboard">Refresh</button>
+        </div>
+        <div id="dashboardPosition"></div>
+        <div class="twz-loading" id="dashboardLoading" style="display:none;">Loading…</div>
+      </div>
+      <div class="twz-card" id="feeInfoCard">
+        <h3>Fee config</h3>
+        <div class="twz-info-row"><span class="key">Performance fee (bps)</span><span class="val" id="feePerfBps">—</span></div>
+        <div class="twz-info-row"><span class="key">Deposit fee (bps)</span><span class="val" id="feeDepBps">—</span></div>
+        <div class="twz-hint">Fees are set on the contract. Deposit and performance fees apply per transaction.</div>
+      </div>
+      <div class="twz-card">
+        <h3>Network</h3>
+        <div class="twz-info-row"><span class="key">Chain ID</span><span class="val" id="networkChainId">—</span></div>
+        <div class="twz-info-row"><span class="key">Contract</span><span class="val mono" id="networkContract">—</span><button type="button" class="twz-copy-btn" id="btnCopyContract">Copy</button></div>
+      </div>
+    </section>
+
+    <section class="twz-panel" id="panel-deposit">
+      <div class="twz-card">
+        <h3>Deposit tokens</h3>
+        <div class="twz-form-group">
+          <label>Token address</label>
+          <input type="text" id="depositToken" placeholder="0x…" />
+        </div>
+        <div class="twz-form-group">
+          <label>Amount (human, e.g. 100)</label>
+          <input type="text" id="depositAmount" placeholder="0" />
+        </div>
+        <button type="button" class="twz-btn primary" id="btnDeposit">Deposit</button>
+      </div>
+    </section>
+
+    <section class="twz-panel" id="panel-withdraw">
+      <div class="twz-card">
+        <h3>Withdraw tokens</h3>
+        <div class="twz-form-group">
+          <label>Token address</label>
+          <input type="text" id="withdrawToken" placeholder="0x…" />
+        </div>
+        <div class="twz-form-group">
+          <label>Amount (human)</label>
+          <input type="text" id="withdrawAmount" placeholder="0" />
+        </div>
+        <button type="button" class="twz-btn primary" id="btnWithdraw">Withdraw</button>
+      </div>
+    </section>
+
+    <section class="twz-panel" id="panel-claim">
+      <div class="twz-card">
+        <h3>Claim vested yield</h3>
+        <div class="twz-form-group">
+          <label>Token address</label>
+          <input type="text" id="claimToken" placeholder="0x…" />
+        </div>
+        <button type="button" class="twz-btn primary" id="btnClaim">Claim yield</button>
+      </div>
+    </section>
+
+    <section class="twz-panel" id="panel-strategies">
+      <div class="twz-card">
+        <h3>Strategies</h3>
+        <div id="strategiesList"></div>
+        <div class="twz-loading" id="strategiesLoading" style="display:none;">Loading…</div>
+      </div>
+    </section>
+
+    <section class="twz-panel" id="panel-tokens">
+      <div class="twz-card">
+        <h3>Allowed tokens</h3>
+        <div id="tokensList"></div>
+        <div class="twz-loading" id="tokensLoading" style="display:none;">Loading…</div>
+      </div>
+    </section>
+
+    <section class="twz-panel" id="panel-config">
+      <div class="twz-card">
+        <h3>Contract config</h3>
+        <div class="twz-form-group">
+          <label>FundManagerAI contract address</label>
+          <input type="text" id="configContract" placeholder="0x…" />
+        </div>
+        <button type="button" class="twz-btn" id="btnSaveConfig">Save address</button>
+        <p style="margin-top:0.75rem;font-size:0.8rem;color:var(--twz-muted);">Set the deployed FundManagerAI contract address. Reload after saving.</p>
+      </div>
+    </section>
+
+    <section class="twz-panel" id="panel-help">
+      <div class="twz-card">
