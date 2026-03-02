@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Twizzler — FundManagerAI DeFi Yield</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
+  <style>
+    :root {
+      --twz-bg: #0c0f14;
+      --twz-surface: #141922;
+      --twz-card: #1a1f2e;
+      --twz-border: #2a3142;
+      --twz-green: #22c55e;
+      --twz-amber: #f59e0b;
+      --twz-blue: #3b82f6;
+      --twz-muted: #64748b;
+      --twz-text: #f1f5f9;
+      --twz-radius: 12px;
+      --twz-font: 'DM Sans', sans-serif;
+      --twz-mono: 'DM Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--twz-font);
+      background: var(--twz-bg);
+      color: var(--twz-text);
+      min-height: 100vh;
+      background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(34, 197, 94, 0.08), transparent), linear-gradient(180deg, var(--twz-bg) 0%, #0f1219 100%);
+    }
+    .twz-wrap { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
+    .twz-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--twz-border);
+      margin-bottom: 1.25rem;
+    }
+    .twz-logo { font-weight: 700; font-size: 1.75rem; color: var(--twz-green); }
+    .twz-tagline { font-size: 0.8rem; color: var(--twz-muted); margin-top: 0.2rem; }
+    .twz-connect { display: flex; align-items: center; gap: 0.75rem; }
+    .twz-addr { font-family: var(--twz-mono); font-size: 0.8rem; color: var(--twz-amber); max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+    .twz-btn {
+      font-family: var(--twz-font);
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--twz-border);
+      background: var(--twz-card);
+      color: var(--twz-text);
+      cursor: pointer;
+      border-radius: var(--twz-radius);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .twz-btn:hover { border-color: var(--twz-green); background: var(--twz-surface); }
+    .twz-btn.primary { background: var(--twz-green); border-color: var(--twz-green); color: #fff; }
+    .twz-btn.primary:hover { filter: brightness(1.1); }
+    .twz-tabs { display: flex; gap: 0.25rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .twz-tab {
+      padding: 0.6rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: var(--twz-surface);
+      border: 1px solid var(--twz-border);
+      color: var(--twz-muted);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .twz-tab:hover { color: var(--twz-text); }
+    .twz-tab.active { background: var(--twz-card); color: var(--twz-green); border-color: var(--twz-green); }
+    .twz-panel { display: none; }
+    .twz-panel.visible { display: block; }
+    .twz-card {
+      background: var(--twz-card);
+      border: 1px solid var(--twz-border);
+      border-radius: var(--twz-radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .twz-card h3 { font-size: 1rem; margin-bottom: 0.75rem; color: var(--twz-amber); }
+    .twz-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+    .twz-stat { background: var(--twz-surface); border: 1px solid var(--twz-border); border-radius: 8px; padding: 0.9rem; text-align: center; }
+    .twz-stat .val { font-size: 1.1rem; color: var(--twz-green); font-family: var(--twz-mono); }
+    .twz-stat .lbl { font-size: 0.75rem; color: var(--twz-muted); margin-top: 0.2rem; }
+    .twz-form-group { margin-bottom: 1rem; }
+    .twz-form-group label { display: block; font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--twz-muted); }
