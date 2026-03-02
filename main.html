@@ -370,3 +370,96 @@
   }
 
   function weiToHumanLong(wei, decimals) {
+    decimals = decimals || 18;
+    if (typeof wei !== "bigint" && typeof wei !== "number") wei = BigInt(wei);
+    const d = Number(wei) / Math.pow(10, decimals);
+    return d.toFixed(Math.min(decimals, 12));
+  }
+
+  function formatBpsAsPercent(bps) {
+    return (Number(bps) / 100).toFixed(2) + "%";
+  }
+
+  function formatBlockNumber(blockNum) {
+    return String(blockNum);
+  }
+
+  function formatAddressShort(addr, len) {
+    len = len || 6;
+    if (!addr || addr.length < len * 2 + 2) return addr || "";
+    return addr.slice(0, 2 + len) + "…" + addr.slice(-len);
+  }
+
+  function formatTxHash(hash) {
+    return formatAddressShort(hash, 8);
+  }
+
+  function parsePositiveInt(s, defaultVal) {
+    const n = parseInt(String(s).trim(), 10);
+    return (isNaN(n) || n < 0) ? (defaultVal || 0) : n;
+  }
+
+  function parsePositiveFloat(s, defaultVal) {
+    const n = parseFloat(String(s).trim());
+    return (isNaN(n) || n < 0) ? (defaultVal || 0) : n;
+  }
+
+  function isZeroAddress(addr) {
+    if (!addr) return true;
+    const a = String(addr).trim().toLowerCase();
+    if (a.startsWith("0x")) return a === "0x" + "0".repeat(40);
+    return a === "0".repeat(40);
+  }
+
+  function assertEthereum() {
+    if (!window.ethereum) throw new Error("No ethereum provider (e.g. MetaMask)");
+  }
+
+  function assertContractAddress() {
+    if (!contractAddress || contractAddress.length < 42) throw new Error("Contract address not set or invalid");
+  }
+
+  function assertConnected() {
+    if (!userAddress) throw new Error("Wallet not connected");
+  }
+
+  function getChainIdSync() {
+    return window.ethereum && window.ethereum.chainId ? parseInt(window.ethereum.chainId, 16) : null;
+  }
+
+  function getChainName(chainId) {
+    var names = { 1: "Ethereum Mainnet", 11155111: "Sepolia", 56: "BSC", 137: "Polygon" };
+    return names[chainId] || "Chain " + chainId;
+  }
+
+  function humanToWei(s) {
+    const n = parseFloat(String(s).trim());
+    if (isNaN(n)) return 0n;
+    return BigInt(Math.round(n * 1e18));
+  }
+
+  function initContract() {
+    if (!contractAddress || !window.ethereum) return null;
+    try {
+      const p = new ethers.BrowserProvider(window.ethereum);
+      return new ethers.Contract(contractAddress, ABI, p);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function getContractWithSigner() {
+    if (!contractAddress || !signer) return null;
+    try {
+      return new ethers.Contract(contractAddress, ABI, signer);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function connect() {
+    try {
+      const w = window.ethereum;
+      if (!w) { showMsg("No wallet found. Install MetaMask or similar.", true); return; }
+      const accounts = await w.request({ method: "eth_requestAccounts" });
+      if (!accounts.length) { showMsg("No account selected.", true); return; }
