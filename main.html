@@ -928,3 +928,96 @@
   function twzHasWallet() { return !!userAddress; }
   function twzReady() { return twzHasContract() && twzHasWallet(); }
   function twzStatusText() {
+    if (!twzHasContract()) return "Set contract address in Config";
+    if (!twzHasWallet()) return "Connect wallet";
+    return "Ready";
+  }
+  window.twz.hasContract = twzHasContract;
+  window.twz.hasWallet = twzHasWallet;
+  window.twz.ready = twzReady;
+  window.twz.statusText = twzStatusText;
+  function twzLocalStorageSet(key, val) { localStorage.setItem(key, val); }
+  function twzLocalStorageRemove(key) { localStorage.removeItem(key); }
+  function twzDefaultGasLimit() { return 300000; }
+  function twzDefaultDecimals() { return 18; }
+  function twzBpsBase() { return 10000; }
+  function twzFeeBpsToPercent(bps) { return (Number(bps) / twzBpsBase()).toFixed(2) + "%"; }
+  function twzPercentToBps(percent) { return Math.round(Number(percent) * twzBpsBase() / 100); }
+  function twzWeiToEther(wei) { return Number(wei) / 1e18; }
+  function twzEtherToWei(ether) { return BigInt(Math.round(Number(ether) * 1e18)); }
+  function twzMinWei(a, b) { return a < b ? a : b; }
+  function twzMaxWei(a, b) { return a > b ? a : b; }
+  function twzClampWei(wei, low, high) {
+    wei = BigInt(wei);
+    low = BigInt(low);
+    high = BigInt(high);
+    if (wei < low) return low;
+    if (wei > high) return high;
+    return wei;
+  }
+  function twzIsPausedDisplay() { return $("statPaused").textContent === "Yes"; }
+  function twzContractDisplayAddr() { return contractAddress || ""; }
+  function twzUserDisplayAddr() { return userAddress ? shortAddr(userAddress) : ""; }
+  function twzFullUserAddr() { return userAddress || ""; }
+  function twzFullContractAddr() { return contractAddress || ""; }
+  function twzRefreshButtonEl() { return $("btnRefreshDashboard"); }
+  function twzCopyButtonEl() { return $("btnCopyContract"); }
+  function twzConnectButtonEl() { return $("btnConnect"); }
+  function twzDepositButtonEl() { return $("btnDeposit"); }
+  function twzWithdrawButtonEl() { return $("btnWithdraw"); }
+  function twzClaimButtonEl() { return $("btnClaim"); }
+  function twzSaveConfigButtonEl() { return $("btnSaveConfig"); }
+  function twzDisableDepositButton(disabled) { $("btnDeposit").disabled = !!disabled; }
+  function twzDisableWithdrawButton(disabled) { $("btnWithdraw").disabled = !!disabled; }
+  function twzDisableClaimButton(disabled) { $("btnClaim").disabled = !!disabled; }
+  function twzDisableConnectButton(disabled) { $("btnConnect").disabled = !!disabled; }
+  function twzDisableSaveConfigButton(disabled) { $("btnSaveConfig").disabled = !!disabled; }
+  function twzFocusDepositToken() { $("depositToken").focus(); }
+  function twzFocusWithdrawToken() { $("withdrawToken").focus(); }
+  function twzFocusClaimToken() { $("claimToken").focus(); }
+  function twzFocusConfigContract() { $("configContract").focus(); }
+  function twzClearDepositForm() { $("depositToken").value = ""; $("depositAmount").value = ""; }
+  function twzClearWithdrawForm() { $("withdrawToken").value = ""; $("withdrawAmount").value = ""; }
+  function twzClearClaimForm() { $("claimToken").value = ""; }
+  function twzGetDepositTokenValue() { return ($("depositToken").value || "").trim(); }
+  function twzGetDepositAmountValue() { return ($("depositAmount").value || "").trim(); }
+  function twzGetWithdrawTokenValue() { return ($("withdrawToken").value || "").trim(); }
+  function twzGetWithdrawAmountValue() { return ($("withdrawAmount").value || "").trim(); }
+  function twzGetClaimTokenValue() { return ($("claimToken").value || "").trim(); }
+  function twzGetConfigContractValue() { return ($("configContract").value || "").trim(); }
+  function twzSetConfigContractValue(v) { $("configContract").value = v; }
+  function twzSetDepositTokenValue(v) { $("depositToken").value = v; }
+  function twzSetDepositAmountValue(v) { $("depositAmount").value = v; }
+  function twzSetWithdrawTokenValue(v) { $("withdrawToken").value = v; }
+  function twzSetWithdrawAmountValue(v) { $("withdrawAmount").value = v; }
+  function twzSetClaimTokenValue(v) { $("claimToken").value = v; }
+  function twzValidateDepositForm() {
+    var token = twzGetDepositTokenValue();
+    var amount = twzGetDepositAmountValue();
+    if (!token) return "Token address required";
+    if (!amount || parseFloat(amount) <= 0) return "Amount must be positive";
+    return null;
+  }
+  function twzValidateWithdrawForm() {
+    var token = twzGetWithdrawTokenValue();
+    var amount = twzGetWithdrawAmountValue();
+    if (!token) return "Token address required";
+    if (!amount || parseFloat(amount) <= 0) return "Amount must be positive";
+    return null;
+  }
+  function twzValidateClaimForm() {
+    var token = twzGetClaimTokenValue();
+    if (!token) return "Token address required";
+    return null;
+  }
+  function twzValidateConfigForm() {
+    var addr = twzGetConfigContractValue();
+    if (!addr || addr.length < 42) return "Valid contract address required";
+    return null;
+  }
+  function twzDoDepositWithValidation() {
+    var err = twzValidateDepositForm();
+    if (err) { showMsg(err, true); return; }
+    doDeposit();
+  }
+  function twzDoWithdrawWithValidation() {
