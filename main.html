@@ -742,3 +742,96 @@
     if (panel) panel.classList.add("visible");
   }
   function twzGetStatDeposited() { return $("statDeposited").textContent; }
+  function twzGetStatWithdrawn() { return $("statWithdrawn").textContent; }
+  function twzGetStatYield() { return $("statYield").textContent; }
+  function twzGetStatStrategies() { return $("statStrategies").textContent; }
+  function twzGetStatPaused() { return $("statPaused").textContent; }
+  function twzDepositTokenEl() { return $("depositToken"); }
+  function twzDepositAmountEl() { return $("depositAmount"); }
+  function twzWithdrawTokenEl() { return $("withdrawToken"); }
+  function twzWithdrawAmountEl() { return $("withdrawAmount"); }
+  function twzClaimTokenEl() { return $("claimToken"); }
+  function twzConfigContractEl() { return $("configContract"); }
+  function twzMsgBoxEl() { return msgBox; }
+  function twzWalletAddrEl() { return walletAddr; }
+  function twzProvider() { return provider; }
+  function twzSigner() { return signer; }
+  function twzContract() { return contract; }
+  function twzInitContract() { return initContract(); }
+  function twzGetContractWithSigner() { return getContractWithSigner(); }
+  function twzLoadGlobalStats() { return loadGlobalStats(); }
+  function twzLoadDashboard() { return loadDashboard(); }
+  function twzLoadStrategies() { return loadStrategies(); }
+  function twzLoadTokens() { return loadTokens(); }
+  function twzLoadFeeConfig() { return loadFeeConfig(); }
+  function twzLoadNetworkInfo() { return loadNetworkInfo(); }
+  function twzDoDeposit() { return doDeposit(); }
+  function twzDoWithdraw() { return doWithdraw(); }
+  function twzDoClaim() { return doClaim(); }
+  function twzSaveConfig() { return saveConfig(); }
+  function twzConnect() { return connect(); }
+  function twzCopyContract() { return copyContractAddress(); }
+  /* Twizzler public API for external scripts or console usage */
+  window.twizzler = {
+    formatBps: twzFormatBps,
+    formatWei: twzFormatWei,
+    parseWei: twzParseWei,
+    validateAddress: twzValidateAddress,
+    getContractAddr: twzGetContractAddr,
+    setContractAddr: twzSetContractAddr,
+    reloadAll: twzReloadAll,
+    isConnected: twzIsConnected,
+    userAddr: twzUserAddr,
+    shortAddr: twzShort,
+    showError: twzShowError,
+    showOk: twzShowOk,
+    decimals: twzDecimals,
+    bpsDenom: twzBpsDenom,
+    feeFromBps: twzFeeFromBps,
+    netAfterFee: twzNetAfterFee,
+    version: twzVersion,
+    appName: twzAppName,
+    panelShow: twzPanelShow,
+    connect: twzConnect,
+    deposit: twzDoDeposit,
+    withdraw: twzDoWithdraw,
+    claim: twzDoClaim,
+    saveConfig: twzSaveConfig,
+    loadStats: twzLoadGlobalStats,
+    loadDashboard: twzLoadDashboard,
+    loadStrategies: twzLoadStrategies,
+    loadTokens: twzLoadTokens,
+    loadFeeConfig: twzLoadFeeConfig,
+    loadNetworkInfo: twzLoadNetworkInfo,
+    copyContract: twzCopyContract
+  };
+
+  document.querySelectorAll(".twz-tab").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      document.querySelectorAll(".twz-tab").forEach(function (t) { t.classList.remove("active"); });
+      tab.classList.add("active");
+      const panelId = "panel-" + tab.getAttribute("data-panel");
+      document.querySelectorAll(".twz-panel").forEach(function (p) { p.classList.remove("visible"); });
+      const panel = document.getElementById(panelId);
+      if (panel) {
+        panel.classList.add("visible");
+        if (panelId === "panel-dashboard") loadDashboard();
+        if (panelId === "panel-strategies") loadStrategies();
+        if (panelId === "panel-tokens") loadTokens();
+        if (panelId === "panel-config") { $("configContract").value = contractAddress; }
+      }
+    });
+  });
+
+  function twzPopulateDepositFromToken(tokenAddr) {
+    if (tokenAddr) $("depositToken").value = tokenAddr;
+  }
+  function twzPopulateWithdrawFromToken(tokenAddr) {
+    if (tokenAddr) $("withdrawToken").value = tokenAddr;
+  }
+  function twzPopulateClaimFromToken(tokenAddr) {
+    if (tokenAddr) $("claimToken").value = tokenAddr;
+  }
+  function twzGetDashboardEl() { return document.getElementById("dashboardPosition"); }
+  function twzGetStrategiesEl() { return document.getElementById("strategiesList"); }
+  function twzGetTokensEl() { return document.getElementById("tokensList"); }
