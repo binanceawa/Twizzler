@@ -835,3 +835,96 @@
   function twzGetDashboardEl() { return document.getElementById("dashboardPosition"); }
   function twzGetStrategiesEl() { return document.getElementById("strategiesList"); }
   function twzGetTokensEl() { return document.getElementById("tokensList"); }
+  function twzSetStatDeposited(v) { $("statDeposited").textContent = v; }
+  function twzSetStatWithdrawn(v) { $("statWithdrawn").textContent = v; }
+  function twzSetStatYield(v) { $("statYield").textContent = v; }
+  function twzSetStatStrategies(v) { $("statStrategies").textContent = v; }
+  function twzSetStatPaused(v) { $("statPaused").textContent = v; }
+  function twzSetFeePerfBps(v) { $("feePerfBps").textContent = v; }
+  function twzSetFeeDepBps(v) { $("feeDepBps").textContent = v; }
+  function twzSetNetworkChainId(v) { $("networkChainId").textContent = v; }
+  function twzSetNetworkContract(v) { $("networkContract").textContent = v; }
+  function twzShowLoadingDashboard(show) { $("dashboardLoading").style.display = show ? "block" : "none"; }
+  function twzShowLoadingStrategies(show) { $("strategiesLoading").style.display = show ? "block" : "none"; }
+  function twzShowLoadingTokens(show) { $("tokensLoading").style.display = show ? "block" : "none"; }
+  function twzCreateTable(headers, rows) {
+    var html = "<table class=\"twz-table\"><thead><tr>";
+    for (var i = 0; i < headers.length; i++) html += "<th>" + headers[i] + "</th>";
+    html += "</tr></thead><tbody>";
+    for (var r = 0; r < rows.length; r++) {
+      html += "<tr>";
+      for (var c = 0; c < rows[r].length; c++) html += "<td>" + rows[r][c] + "</td>";
+      html += "</tr>";
+    }
+    html += "</tbody></table>";
+    return html;
+  }
+  function twzCreateInfoRow(key, val) {
+    return "<div class=\"twz-info-row\"><span class=\"key\">" + key + "</span><span class=\"val\">" + val + "</span></div>";
+  }
+  function twzEscapeHtml(s) {
+    if (!s) return "";
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function twzDebounce(fn, ms) {
+    var t;
+    return function () {
+      var args = arguments;
+      clearTimeout(t);
+      t = setTimeout(function () { fn.apply(null, args); }, ms);
+    };
+  }
+  function twzReloadDashboardDebounced() {
+    return twzDebounce(function () { loadDashboard(); }, 300);
+  }
+  function twzReloadStatsDebounced() {
+    return twzDebounce(function () { loadGlobalStats(); loadFeeConfig(); }, 300);
+  }
+  function twzGetAbiDeposit() {
+    return ABI.filter(function (x) { return x.name === "deposit"; })[0];
+  }
+  function twzGetAbiWithdraw() {
+    return ABI.filter(function (x) { return x.name === "withdraw"; })[0];
+  }
+  function twzGetAbiClaimYield() {
+    return ABI.filter(function (x) { return x.name === "claimYield"; })[0];
+  }
+  function twzGetAbiGetGlobalStats() {
+    return ABI.filter(function (x) { return x.name === "getGlobalStats"; })[0];
+  }
+  function twzGetAbiGetDepositBalance() {
+    return ABI.filter(function (x) { return x.name === "getDepositBalance"; })[0];
+  }
+  function twzGetAbiGetClaimableYield() {
+    return ABI.filter(function (x) { return x.name === "getClaimableYield"; })[0];
+  }
+  function twzGetAbiGetTokenList() {
+    return ABI.filter(function (x) { return x.name === "getTokenList"; })[0];
+  }
+  function twzGetAbiGetStrategy() {
+    return ABI.filter(function (x) { return x.name === "getStrategy"; })[0];
+  }
+  function twzGetAbiStrategyCount() {
+    return ABI.filter(function (x) { return x.name === "strategyCount"; })[0];
+  }
+  function twzGetAbiGetFeeConfig() {
+    return ABI.filter(function (x) { return x.name === "getFeeConfig"; })[0];
+  }
+  function twzAbiFunctionNames() {
+    return ABI.map(function (x) { return x.name; }).filter(function (n, i, a) { return a.indexOf(n) === i; });
+  }
+  function twzAbiViewFunctions() {
+    return ABI.filter(function (x) { return x.stateMutability === "view"; }).map(function (x) { return x.name; });
+  }
+  function twzAbiWriteFunctions() {
+    return ABI.filter(function (x) { return x.stateMutability === "nonpayable" || x.stateMutability === "payable"; }).map(function (x) { return x.name; });
+  }
+  function twzLocalStorageGet(key) { return localStorage.getItem(key); }
+  function twzHasContract() { return !!(contractAddress && contractAddress.length >= 42); }
+  function twzHasWallet() { return !!userAddress; }
+  function twzReady() { return twzHasContract() && twzHasWallet(); }
+  function twzStatusText() {
