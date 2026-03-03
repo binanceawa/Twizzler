@@ -1021,3 +1021,95 @@
     doDeposit();
   }
   function twzDoWithdrawWithValidation() {
+    var err = twzValidateWithdrawForm();
+    if (err) { showMsg(err, true); return; }
+    doWithdraw();
+  }
+  function twzDoClaimWithValidation() {
+    var err = twzValidateClaimForm();
+    if (err) { showMsg(err, true); return; }
+    doClaim();
+  }
+  function twzSaveConfigWithValidation() {
+    var err = twzValidateConfigForm();
+    if (err) { showMsg(err, true); return; }
+    saveConfig();
+  }
+  window.twz = {
+    populateDepositFromToken: twzPopulateDepositFromToken,
+    populateWithdrawFromToken: twzPopulateWithdrawFromToken,
+    populateClaimFromToken: twzPopulateClaimFromToken,
+    validateDepositForm: twzValidateDepositForm,
+    validateWithdrawForm: twzValidateWithdrawForm,
+    validateClaimForm: twzValidateClaimForm,
+    validateConfigForm: twzValidateConfigForm,
+    doDepositWithValidation: twzDoDepositWithValidation,
+    doWithdrawWithValidation: twzDoWithdrawWithValidation,
+    doClaimWithValidation: twzDoClaimWithValidation,
+    saveConfigWithValidation: twzSaveConfigWithValidation,
+    weiToHuman: weiToHuman,
+    humanToWei: humanToWei,
+    shortAddr: shortAddr,
+    getContractAddr: twzGetContractAddr,
+    setContractAddr: twzSetContractAddr,
+    isConnected: twzIsConnected,
+    userAddr: twzUserAddr,
+    reloadAll: twzReloadAll,
+    panelShow: twzPanelShow,
+    createTable: twzCreateTable,
+    createInfoRow: twzCreateInfoRow,
+    escapeHtml: twzEscapeHtml,
+    defaultGasLimit: twzDefaultGasLimit,
+    defaultDecimals: twzDefaultDecimals,
+    bpsBase: twzBpsBase,
+    feeBpsToPercent: twzFeeBpsToPercent,
+    percentToBps: twzPercentToBps,
+    weiToEther: twzWeiToEther,
+    etherToWei: twzEtherToWei,
+    version: twzVersion,
+    appName: twzAppName
+  };
+
+  function twzLog(msg) { try { console.log("[Twizzler] " + msg); } catch (e) {} }
+  function twzWarn(msg) { try { console.warn("[Twizzler] " + msg); } catch (e) {} }
+  function twzError(msg) { try { console.error("[Twizzler] " + msg); } catch (e) {} }
+  function twzOnConnect(cb) { if (typeof cb === "function") window.twizzlerOnConnect = cb; }
+  function twzOnDisconnect(cb) { if (typeof cb === "function") window.twizzlerOnDisconnect = cb; }
+  function twzOnContractSet(cb) { if (typeof cb === "function") window.twizzlerOnContractSet = cb; }
+  function twzEmitConnect() { if (typeof window.twizzlerOnConnect === "function") window.twizzlerOnConnect(); }
+  function twzEmitDisconnect() { if (typeof window.twizzlerOnDisconnect === "function") window.twizzlerOnDisconnect(); }
+  function twzEmitContractSet() { if (typeof window.twizzlerOnContractSet === "function") window.twizzlerOnContractSet(); }
+  window.twz.log = twzLog;
+  window.twz.warn = twzWarn;
+  window.twz.error = twzError;
+  window.twz.onConnect = twzOnConnect;
+  window.twz.onDisconnect = twzOnDisconnect;
+  window.twz.onContractSet = twzOnContractSet;
+  window.twz.emitConnect = twzEmitConnect;
+  window.twz.emitDisconnect = twzEmitDisconnect;
+  window.twz.emitContractSet = twzEmitContractSet;
+  twzLog("Twizzler v" + twzVersion() + " loaded. Set contract address in Config and connect wallet.");
+  if (contractAddress) twzLog("Contract: " + contractAddress);
+
+  if (window.ethereum) {
+    window.ethereum.on("accountsChanged", function (accounts) {
+      if (accounts.length) {
+        userAddress = accounts[0];
+        walletAddr.textContent = shortAddr(userAddress);
+        loadDashboard();
+      } else {
+        userAddress = null;
+        walletAddr.textContent = "";
+      }
+    });
+  }
+
+  loadGlobalStats();
+  loadFeeConfig();
+  loadNetworkInfo();
+  loadStrategies();
+  loadTokens();
+})();
+  </script>
+</body>
+</html>
